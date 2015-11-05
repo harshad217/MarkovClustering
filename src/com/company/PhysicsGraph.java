@@ -12,6 +12,7 @@ public class PhysicsGraph implements Serializable {
 
     TreeSet<String> idSet;
     TreeMap<String, Integer> idMap;
+    TreeMap<Integer, String> reverseMap;
     TreeMap<Integer,ArrayList<Integer>> adjMap;
 
     public TreeMap<String, Integer> getIdMap() {
@@ -36,5 +37,13 @@ public class PhysicsGraph implements Serializable {
 
     public void setAdjMap(TreeMap<Integer, ArrayList<Integer>> adjMap) {
         this.adjMap = adjMap;
+    }
+
+    public void setReverseMap(TreeMap<Integer, String> reverseMap) {
+        this.reverseMap = reverseMap;
+    }
+
+    public TreeMap<Integer, String> getReverseMap() {
+        return reverseMap;
     }
 }

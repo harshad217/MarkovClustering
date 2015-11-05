@@ -56,7 +56,7 @@ public class MarkovClustering {
         }
     }
 
-    public static void markovClustering(double[][] matrix) {
+    public static double[][] markovClustering(double[][] matrix) {
         //Start Markov clustering algorithm while loop
         double[][] R = new double[matrix.length][matrix[0].length];
         boolean flag = false;
@@ -71,7 +71,7 @@ public class MarkovClustering {
             } else {
                 R = matrix;
             }
-            if(System.currentTimeMillis()>start+1000) {
+            if(System.currentTimeMillis()>start+10000) {
                 break;
             }
         }
@@ -79,7 +79,7 @@ public class MarkovClustering {
         System.out.println(flag);
         for(int i=0;i<matrix.length;i++) {
             ArrayList<Integer> list = new ArrayList<>();
-            for(int j=0;j<matrix.length;j++) {
+            for(int j=0;j<matrix[0].length;j++) {
                 if(matrix[i][j]!=0) {
                     list.add(j);
                 }
@@ -90,6 +90,10 @@ public class MarkovClustering {
             }
             System.out.println();
         }
+        if(flag)
+            return R;
+        else
+            return null;
     }
 
     public static PhysicsGraph createPhysicsGraph(String path) throws Exception {
@@ -100,6 +104,7 @@ public class MarkovClustering {
 
         TreeSet<String> idSet = new TreeSet<>();            //for mapping
         TreeMap<String,Integer> idMap = new TreeMap<>();   //for mapping
+        TreeMap<Integer,String> reverseMap = new TreeMap<>();   //for reverse mapping
         TreeMap<Integer,ArrayList<Integer>> adjMap = new TreeMap<>(); //adjacency matrix for phy graph
 
         while( (string = br.readLine())!=null ) {
@@ -144,8 +149,13 @@ public class MarkovClustering {
                 adjMap.put(n2,temp);
             }
         }
+
+        for(Map.Entry entry : idMap.entrySet()){
+            reverseMap.put((Integer) entry.getValue(), (String) entry.getKey());
+        }
         g.setIdSet(idSet);
         g.setIdMap(idMap);
+        g.setReverseMap(reverseMap);
         g.setAdjMap(adjMap);
         return g;
     }
@@ -196,8 +206,7 @@ public class MarkovClustering {
         return result;
     }
 
-    public static double[][] buildMatrix(Graph g) {
-        HashMap<Integer,ArrayList<Integer>> adjMap = g.getAdjacencyMap();
+    public static double[][] buildMatrix(HashMap<Integer,ArrayList<Integer>> adjMap) {
         int N = adjMap.size();
         double[][] matrix = new double[N][N];
 
@@ -232,21 +241,55 @@ public class MarkovClustering {
         String pathYeast = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/yeast_undirected_metabolic.txt";
         String pathPhysics = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/physics_collaboration_net.txt";
 
+        /*************************************** CLUSTERING FOR AT & T GRAPH ******************************************/
         Graph g = generateGraph(pathATT);
+//        printAdjMap(g.getAdjacencyMap());
+        double[][] matrix = buildMatrix(g.getAdjacencyMap());
+        double[][] abc = { {1,2},{3,4} };   //example matrix
+//        printMatrix(inflate(abc));
+//        printMatrix(matrix);
+//        markovClustering(matrix);
+
+
+        /*************************************** CLUSTERING FOR PHYSICS GRAPH ******************************************/
+
         PhysicsGraph pg = createPhysicsGraph(pathPhysics);
+//        TreeMap<String,Integer> idmap = pg.getIdMap();    // just printing out stuff
+//        for(Map.Entry entry : idmap.entrySet()) {
+//            System.out.println("name= "+entry.getKey()+" id= "+entry.getValue());
+//        }
         HashMap<Integer,ArrayList<Integer>> hmap = new HashMap<>();
         hmap.putAll(pg.getAdjMap());
         printAdjMap(hmap);
+        double[][] physicsMatrix = buildMatrix(hmap);
+        double[][] R = markovClustering(physicsMatrix);
+        LinkedHashMap<Integer, ArrayList<Integer>> clusterResult = new LinkedHashMap<>();
+        for(int i=0;i<R.length;i++) {
+            ArrayList<Integer> list = new ArrayList<>();
+            for(int j=0;j<R[0].length;j++) {
+                if(R[i][j]!=0) {
+                    list.add(j);
+                }
+            }
+//            System.out.print("for cluster"+i+": ");       //for cluster row 'i'
+            if(!list.isEmpty()) {
+                clusterResult.put(i,list);
+            }
+        }
+        for(Map.Entry entry : clusterResult.entrySet()) {
+            System.out.print("Node Name = " + pg.getReverseMap().get(entry.getKey()) + " & attached nodes= ");
+            for(int i: (ArrayList<Integer>) entry.getValue()) {
+                System.out.print(" " + pg.getReverseMap().get(i));
+            }
+            System.out.println();
+        }
 
-//        printAdjMap(g.getAdjacencyMap());
 
-        double[][] matrix = buildMatrix(g);
-        double[][] abc = { {1,2},{3,4} };
+        /*************************************** CLUSTERING FOR YEAST GRAPH ******************************************/
 
-//        printMatrix(inflate(abc));
-//        printMatrix(matrix);
 
-//        markovClustering(matrix);
+
+
+
     }
-
 }
