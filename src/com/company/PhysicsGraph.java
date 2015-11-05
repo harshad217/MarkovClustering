@@ -10,10 +10,10 @@ import java.util.TreeSet;
  */
 public class PhysicsGraph implements Serializable {
 
-    TreeSet<String> idSet;
-    TreeMap<String, Integer> idMap;
-    TreeMap<Integer, String> reverseMap;
-    TreeMap<Integer,ArrayList<Integer>> adjMap;
+    TreeSet<String> idSet;  //all unique ids
+    TreeMap<String, Integer> idMap; //for mapping ser num to ids
+    TreeMap<Integer, String> reverseMap; //reverse
+    TreeMap<Integer,ArrayList<Integer>> adjMap; //adjacency matrix
 
     public TreeMap<String, Integer> getIdMap() {
         return idMap;

@@ -234,6 +234,71 @@ public class MarkovClustering {
         return matrix;
     }
 
+    private static YeastGraph createYeastGraph(String pathYeast) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(pathYeast));
+        String string;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        TreeSet<Integer> idSet = new TreeSet<>();
+        TreeMap<Integer,Integer> idMap = new TreeMap<>();
+        TreeMap<Integer,Integer> reverseMap = new TreeMap<>();
+        TreeMap<Integer,ArrayList<Integer>> adjMap = new TreeMap<>();
+
+        while( (string = br.readLine())!=null ) {
+            stringBuilder.append(string+"\n");
+        }
+
+        String[] rows = stringBuilder.toString().split("\n");
+        for(String row : rows) {
+            int n1 = Integer.parseInt(row.split("\\t")[0]);
+            int n2 = Integer.parseInt(row.split("\\t")[1]);
+            idSet.add(n1);
+            idSet.add(n2);
+        }
+
+        int id=0;
+        for(int i: idSet) {
+            idMap.put(i, id);
+            id = id + 1;
+        }
+
+        for(Map.Entry entry : idMap.entrySet()) {
+            reverseMap.put((Integer)entry.getValue(),(Integer)entry.getKey());
+        }
+
+        for(String row : rows) {
+            int n1 = idMap.get(Integer.parseInt(row.split("\\t")[0]));
+            int n2 = idMap.get(Integer.parseInt(row.split("\\t")[1]));
+
+            if(adjMap.containsKey(n1)) {
+                ArrayList<Integer> temp = adjMap.get(n1);
+                temp.add(n2);
+                adjMap.put(n1,temp);
+            } else {
+                ArrayList<Integer> temp = new ArrayList<>();
+                temp.add(n2);
+                adjMap.put(n1,temp);
+            }
+            if(adjMap.containsKey(n2)) {
+                ArrayList<Integer> temp = adjMap.get(n2);
+                temp.add(n1);
+                adjMap.put(n2,temp);
+            } else {
+                ArrayList<Integer> temp = new ArrayList<>();
+                temp.add(n1);
+                adjMap.put(n2,temp);
+            }
+        }
+
+        YeastGraph yg = new YeastGraph();
+        yg.setIdSet(idSet);
+        yg.setIdMap(idMap);
+        yg.setReverseMap(reverseMap);
+        yg.setAjdMap(adjMap);
+
+        return yg;
+    }
+
 
     public static void main(String[] args) throws Exception {
 
@@ -248,7 +313,7 @@ public class MarkovClustering {
         double[][] abc = { {1,2},{3,4} };   //example matrix
 //        printMatrix(inflate(abc));
 //        printMatrix(matrix);
-//        markovClustering(matrix);
+        double[][] R1 =  markovClustering(matrix);
 
 
         /*************************************** CLUSTERING FOR PHYSICS GRAPH ******************************************/
@@ -258,37 +323,84 @@ public class MarkovClustering {
 //        for(Map.Entry entry : idmap.entrySet()) {
 //            System.out.println("name= "+entry.getKey()+" id= "+entry.getValue());
 //        }
-        HashMap<Integer,ArrayList<Integer>> hmap = new HashMap<>();
-        hmap.putAll(pg.getAdjMap());
-        printAdjMap(hmap);
-        double[][] physicsMatrix = buildMatrix(hmap);
-        double[][] R = markovClustering(physicsMatrix);
-        LinkedHashMap<Integer, ArrayList<Integer>> clusterResult = new LinkedHashMap<>();
-        for(int i=0;i<R.length;i++) {
-            ArrayList<Integer> list = new ArrayList<>();
-            for(int j=0;j<R[0].length;j++) {
-                if(R[i][j]!=0) {
-                    list.add(j);
-                }
-            }
+//        HashMap<Integer,ArrayList<Integer>> hmap = new HashMap<>();
+//        hmap.putAll(pg.getAdjMap());
+//        printAdjMap(hmap);
+//        double[][] physicsMatrix = buildMatrix(hmap);
+//        double[][] R2 = markovClustering(physicsMatrix);
+//        LinkedHashMap<Integer, ArrayList<Integer>> clusterResult = new LinkedHashMap<>();
+//        for(int i=0;i<R2.length;i++) {
+//            ArrayList<Integer> list = new ArrayList<>();
+//            for(int j=0;j<R2[0].length;j++) {
+//                if(R2[i][j]!=0) {
+//                    list.add(j);
+//                }
+//            }
 //            System.out.print("for cluster"+i+": ");       //for cluster row 'i'
-            if(!list.isEmpty()) {
-                clusterResult.put(i,list);
-            }
-        }
-        for(Map.Entry entry : clusterResult.entrySet()) {
-            System.out.print("Node Name = " + pg.getReverseMap().get(entry.getKey()) + " & attached nodes= ");
-            for(int i: (ArrayList<Integer>) entry.getValue()) {
-                System.out.print(" " + pg.getReverseMap().get(i));
-            }
-            System.out.println();
-        }
+//            if(!list.isEmpty()) {
+//                clusterResult.put(i,list);
+//            }
+//        }
+//        for(Map.Entry entry : clusterResult.entrySet()) {
+//            System.out.print("Node Name = " + pg.getReverseMap().get(entry.getKey()) + " & attached nodes= ");
+//            for(int i: (ArrayList<Integer>) entry.getValue()) {
+//                System.out.print(" " + pg.getReverseMap().get(i));
+//            }
+//            System.out.println();
+//        }
 
 
         /*************************************** CLUSTERING FOR YEAST GRAPH ******************************************/
 
+        YeastGraph yg = createYeastGraph(pathYeast);
+        for(int i: yg.getIdSet()) {
+            System.out.println(" "+i);
+        }
 
+        TreeMap<Integer,Integer> idMap = yg.getIdMap();
+        TreeMap<Integer,Integer> reverseMap = yg.getReverseMap();
+        TreeMap<Integer,ArrayList<Integer>> adjMap = yg.getAjdMap();
 
+        for(Map.Entry entry : idMap.entrySet()) {
+            System.out.print("Node id: = " + entry.getKey() + " , serial no. = " + entry.getValue());
+            System.out.println();
+        }
+
+        for(Map.Entry entry : adjMap.entrySet()) {
+            System.out.print("For node = " + yg.getReverseMap().get(entry.getKey())+" , conn nodes = ");
+            for(int i: (ArrayList<Integer>)entry.getValue()) {
+                System.out.print(" " + yg.getReverseMap().get(i));
+            }
+            System.out.println();
+        }
+
+//        System.out.println("Total count= "+yg.getIdSet().size());     //prints number of unique nodes
+        HashMap<Integer,ArrayList<Integer>> tmap = new HashMap<>();
+        tmap.putAll(yg.getAjdMap());
+        printAdjMap(tmap);
+        double[][] yeastMatrix = buildMatrix(tmap);
+        double[][] R3 = markovClustering(yeastMatrix);
+        LinkedHashMap<Integer, ArrayList<Integer>> clusterResult = new LinkedHashMap<>();
+        for(int i=0;i<R3.length;i++) {
+            ArrayList<Integer> list = new ArrayList<>();
+            for(int j=0;j<R3[0].length;j++) {
+                if(R3[i][j]!=0) {
+                    list.add(j);
+                }
+            }
+            System.out.print("for cluster"+i+": ");       //for cluster row 'i'
+            if(!list.isEmpty()) {
+                clusterResult.put(i,list);
+            }
+            System.out.println();
+        }
+        for(Map.Entry entry : clusterResult.entrySet()) {
+            System.out.print("Node Name = " + yg.getReverseMap().get(entry.getKey()) + " & attached nodes= ");
+            for(int i: (ArrayList<Integer>) entry.getValue()) {
+                System.out.print(" " + yg.getReverseMap().get(i));
+            }
+            System.out.println();
+        }
 
 
     }
