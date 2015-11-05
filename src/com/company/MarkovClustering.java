@@ -237,9 +237,9 @@ public class MarkovClustering {
 
     public static void main(String[] args) throws Exception {
 
-        String pathATT = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/attweb_net.txt";
-        String pathYeast = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/yeast_undirected_metabolic.txt";
-        String pathPhysics = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/physics_collaboration_net.txt";
+        String pathATT = "/Users/harshad/IdeaProjects/MarkovClustering/Data/attweb_net.txt";
+        String pathYeast = "/Users/harshad/IdeaProjects/MarkovClustering/Data/yeast_undirected_metabolic.txt";
+        String pathPhysics = "/Users/harshad/IdeaProjects/MarkovClustering/Data/physics_collaboration_net.txt";
 
         /*************************************** CLUSTERING FOR AT & T GRAPH ******************************************/
         Graph g = generateGraph(pathATT);
