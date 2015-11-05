@@ -150,32 +150,6 @@ public class MarkovClustering {
         return g;
     }
 
-    public static void main(String[] args) throws Exception {
-	// write your code here
-        String pathATT = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/attweb_net.txt";
-        String pathYeast = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/yeast_undirected_metabolic.txt";
-        String pathPhysics = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/physics_collaboration_net.txt";
-
-        Graph g = generateGraph(pathATT);
-        PhysicsGraph pg = createPhysicsGraph(pathPhysics);
-        HashMap<Integer,ArrayList<Integer>> hmap = new HashMap<>();
-        hmap.putAll(pg.getAdjMap());
-        printAdjMap(hmap);
-
-
-//        printAdjMap(g.getAdjacencyMap());
-
-        double[][] matrix = buildMatrix(g);
-        double[][] abc = { {1,2},{3,4} };
-
-//        printMatrix(inflate(abc));
-//        printMatrix(matrix);
-
-//        markovClustering(matrix);
-
-
-    }
-
     public static double[][] inflate(double[][] matrix) {
         /*
         Square each column, then normalize
@@ -250,4 +224,29 @@ public class MarkovClustering {
         }
         return matrix;
     }
+
+
+    public static void main(String[] args) throws Exception {
+
+        String pathATT = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/attweb_net.txt";
+        String pathYeast = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/yeast_undirected_metabolic.txt";
+        String pathPhysics = "/Users/harshad/IdeaProjects/MarkovClustering/Data_For_HW3/physics_collaboration_net.txt";
+
+        Graph g = generateGraph(pathATT);
+        PhysicsGraph pg = createPhysicsGraph(pathPhysics);
+        HashMap<Integer,ArrayList<Integer>> hmap = new HashMap<>();
+        hmap.putAll(pg.getAdjMap());
+        printAdjMap(hmap);
+
+//        printAdjMap(g.getAdjacencyMap());
+
+        double[][] matrix = buildMatrix(g);
+        double[][] abc = { {1,2},{3,4} };
+
+//        printMatrix(inflate(abc));
+//        printMatrix(matrix);
+
+//        markovClustering(matrix);
+    }
+
 }
