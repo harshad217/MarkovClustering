@@ -6,8 +6,6 @@ import java.util.*;
 
 public class MarkovClustering {
 
-    /************************************** DO NOT USE!!!!! **************************************/
-
     public static void printAdjMap(HashMap hMap) {
         HashMap<Integer,ArrayList<Integer>> map = hMap;
         for(Map.Entry entry : map.entrySet()) {
